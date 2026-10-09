@@ -17,3 +17,5 @@ export const INITIAL_DATA = {
   incomingJuly: 0,
   memo: '',
 };
+
+export const genId = () => Math.random().toString(36).slice(2, 9);
