@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { fmt, fmtDate, daysUntil, getPayoffDate, monthsAhead } from '../utils/calc';
 
 function dueLabel(d) {
@@ -10,7 +10,12 @@ function dueLabel(d) {
   return { text: `あと${n}日`, cls: '' };
 }
 
+const UI_KEY = 'ml-ui-home';
+const readUi = () => { try { return JSON.parse(localStorage.getItem(UI_KEY)) || {}; } catch { return {}; } };
+
 export default function Dashboard({ data, totals, go }) {
+  const [ui, setUi] = useState(readUi);
+  const toggleDue = () => setUi(prev => { const next = { ...prev, dueHidden: !prev.dueHidden }; try { localStorage.setItem(UI_KEY, JSON.stringify(next)); } catch { /* ignore */ } return next; });
   const limit = monthsAhead(3);
   const next = totals.upcoming.filter(d => d.dueDate <= limit); // 期限切れも含め、3ヶ月以内を全部
   return (
@@ -37,8 +42,11 @@ export default function Dashboard({ data, totals, go }) {
         )}
       </div>
 
-      <div className="section-label">直近の期限（3ヶ月以内）</div>
-      <div className="card" style={{ marginTop: 0 }}>
+      <button className="group-head-btn" onClick={toggleDue} aria-expanded={!ui.dueHidden}>
+        <span><span className="chev">{ui.dueHidden ? '▶' : '▼'}</span>直近の期限（3ヶ月以内・{next.length}件）</span>
+        {ui.dueHidden && <span className="kpi-sub">タップで表示</span>}
+      </button>
+      {!ui.dueHidden && <div className="card" style={{ marginTop: 0 }}>
         {next.length === 0 && <div className="kpi-sub">3ヶ月以内に期限の借金はありません</div>}
         {next.map(d => {
           const l = dueLabel(d);
@@ -53,7 +61,7 @@ export default function Dashboard({ data, totals, go }) {
             </div>
           );
         })}
-      </div>
+      </div>}
     </div>
   );
 }
