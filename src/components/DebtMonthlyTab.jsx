@@ -2,38 +2,38 @@ import React, { useState } from 'react';
 import { fmt } from '../utils/calc';
 import { genId } from '../data/initial';
 
-export default function Debt1Tab({ data, updateData, totals }) {
+export default function DebtMonthlyTab({ data, updateData, totals }) {
   const [editId, setEditId] = useState(null);
   const [adding, setAdding] = useState(false);
   const [newItem, setNewItem] = useState({ name: '', balance: 0, monthly: 0, note: '' });
 
   const update = (id, key, val) => {
-    updateData(prev => ({ ...prev, debt1: prev.debt1.map(d => d.id === id ? { ...d, [key]: val } : d) }));
+    updateData(prev => ({ ...prev, debtMonthly: prev.debtMonthly.map(d => d.id === id ? { ...d, [key]: val } : d) }));
   };
   const del = (id) => {
     if (!confirm('削除しますか？')) return;
-    updateData(prev => ({ ...prev, debt1: prev.debt1.filter(d => d.id !== id) }));
+    updateData(prev => ({ ...prev, debtMonthly: prev.debtMonthly.filter(d => d.id !== id) }));
   };
   const add = () => {
     if (!newItem.name) return;
-    updateData(prev => ({ ...prev, debt1: [...prev.debt1, { ...newItem, id: genId() }] }));
+    updateData(prev => ({ ...prev, debtMonthly: [...prev.debtMonthly, { ...newItem, id: genId() }] }));
     setNewItem({ name: '', balance: 0, monthly: 0, note: '' });
     setAdding(false);
   };
 
-  const sorted = [...data.debt1].sort((a, b) => (b.balance || 0) - (a.balance || 0));
+  const sorted = [...data.debtMonthly].sort((a, b) => (b.balance || 0) - (a.balance || 0));
 
   return (
     <div>
       <div className="nw-big" style={{ borderColor: '#fecaca', background: '#fef2f2' }}>
-        <div className="nw-big-label" style={{ color: 'var(--red)' }}>借金①総残高</div>
-        <div className="nw-big-value neg" style={{ fontSize: 26 }}>{fmt(totals.debt1Total)}</div>
+        <div className="nw-big-label" style={{ color: 'var(--red)' }}>毎月返済している借金（残り）</div>
+        <div className="nw-big-value neg" style={{ fontSize: 26 }}>{fmt(totals.debtMonthlyTotal)}</div>
         <div style={{ fontSize: 12, color: 'var(--text3)', marginTop: 4 }}>
-          月次返済 {fmt(totals.debt1Monthly)} ／ 完済予定 {totals.monthsToPayoff ? `約${totals.monthsToPayoff}ヶ月後` : '—'}
+          月額合計 {fmt(totals.debtMonthlyPayment)} ／ 完済予定 {totals.monthsToPayoff ? `約${totals.monthsToPayoff}ヶ月後` : '—'}
         </div>
       </div>
 
-      <div className="section-label">借金一覧（通常返済中）</div>
+      <div className="section-label">一覧（残りが多い順）</div>
 
       <div style={{ margin: '0 14px' }}>
         {sorted.map(d => (
@@ -45,14 +45,14 @@ export default function Debt1Tab({ data, updateData, totals }) {
                   <span className="item-amount red">{fmt(d.balance)}</span>
                 </div>
                 <div className="item-sub">
-                  月次 {fmt(d.monthly)}
+                  月額 {fmt(d.monthly)}
                   {d.monthly > 0 && d.balance > 0 && ` ／ 残${Math.ceil(d.balance / d.monthly)}ヶ月`}
                   {d.note && ` ／ ${d.note}`}
                 </div>
                 {/* 残高バー */}
                 <div className="progress-wrap" style={{ marginTop: 6 }}>
                   <div className="progress-fill" style={{
-                    width: `${totals.debt1Total > 0 ? (d.balance / totals.debt1Total * 100) : 0}%`,
+                    width: `${totals.debtMonthlyTotal > 0 ? (d.balance / totals.debtMonthlyTotal * 100) : 0}%`,
                     background: '#ef4444'
                   }} />
                 </div>
@@ -73,7 +73,7 @@ export default function Debt1Tab({ data, updateData, totals }) {
                       value={d.balance || ''} onChange={e => update(d.id, 'balance', Number(e.target.value) || 0)} />
                   </div>
                   <div className="input-group">
-                    <label className="input-label">月次返済 (¥)</label>
+                    <label className="input-label">月額 (¥)</label>
                     <input className="input-field" type="number" inputMode="numeric"
                       value={d.monthly || ''} onChange={e => update(d.id, 'monthly', Number(e.target.value) || 0)} />
                   </div>
@@ -105,7 +105,7 @@ export default function Debt1Tab({ data, updateData, totals }) {
                   onChange={e => setNewItem(p => ({ ...p, balance: Number(e.target.value) || 0 }))} />
               </div>
               <div className="input-group">
-                <label className="input-label">月次返済 (¥)</label>
+                <label className="input-label">月額 (¥)</label>
                 <input className="input-field" type="number" inputMode="numeric"
                   value={newItem.monthly || ''}
                   onChange={e => setNewItem(p => ({ ...p, monthly: Number(e.target.value) || 0 }))} />
@@ -129,8 +129,8 @@ export default function Debt1Tab({ data, updateData, totals }) {
       </div>
 
       <div className="total-bar" style={{ marginBottom: 16 }}>
-        <span className="total-bar-label">総残高</span>
-        <span className="total-bar-value" style={{ color: 'var(--red)' }}>{fmt(totals.debt1Total)}</span>
+        <span className="total-bar-label">残りの総額</span>
+        <span className="total-bar-value" style={{ color: 'var(--red)' }}>{fmt(totals.debtMonthlyTotal)}</span>
       </div>
     </div>
   );

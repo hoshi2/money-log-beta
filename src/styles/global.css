@@ -316,15 +316,16 @@ select.input-field { cursor: pointer; }
 .badge-red { background: var(--red-bg); color: var(--red); }
 .badge-gold { background: var(--gold-bg); color: var(--gold); }
 
-/* JULY BOX */
-.july-box {
-  margin: 10px 14px 0;
-  background: #f0fdf4;
-  border: 1px solid #bbf7d0;
-  border-radius: 12px;
-  padding: 14px;
-}
-.july-box-title { font-size: 11px; font-weight: 700; color: var(--green); letter-spacing: 0.5px; margin-bottom: 8px; }
+/* ROW LINES (home) */
+.row-line { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 7px 0; font-size: 13px; color: var(--text2); }
+.row-line b { color: var(--text); font-size: 14px; white-space: nowrap; }
+.row-line.total { font-size: 14px; color: var(--text); }
+.row-line.total b { font-size: 18px; }
+.red { color: var(--red) !important; }
+.green { color: var(--green) !important; }
+.list-item.warn { border-color: var(--red-border); background: var(--red-bg); }
+.item-sub.red { color: var(--red); font-weight: 600; }
+.item-sub.green { color: var(--green); }
 
 /* NET WORTH BIG */
 .nw-big {

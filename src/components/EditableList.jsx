@@ -11,6 +11,7 @@ export default function EditableList({
   amountKey = 'amount',
   nameKey = 'name',
   colorFn = () => 'red',
+  subText = null,
   showDone = false,
   onToggleDone,
   addLabel = '+ 追加',
@@ -51,13 +52,11 @@ export default function EditableList({
                 <span className="item-name" style={{ textDecoration: item.done ? 'line-through' : 'none' }}>
                   {item[nameKey]}
                 </span>
-                <span className={`item-amount ${item.done ? 'green' : colorFn(item)}`}>
+                <span className={`item-amount ${item.done ? 'green' : (colorFn(item) || '')}`}>
                   {fmt(item[amountKey])}
                 </span>
               </div>
-              {fields.filter(f => f.showSub && item[f.key]).map(f => (
-                <div key={f.key} className="item-sub">{f.subLabel || f.label}: {item[f.key]}</div>
-              ))}
+              {subText && <div className="item-sub">{subText(item)}</div>}
             </div>
             <button
               className="btn btn-xs btn-danger"
@@ -85,7 +84,7 @@ export default function EditableList({
                   {f.type === 'select' ? (
                     <select className="input-field" value={item[f.key] || ''}
                       onChange={e => onUpdate(item.id, f.key, e.target.value)}>
-                      {f.options.map(o => <option key={o}>{o}</option>)}
+                      {f.options.map(o => <option key={o.v} value={o.v}>{o.label}</option>)}
                     </select>
                   ) : (
                     <input className="input-field" type={f.type || 'text'}
@@ -121,7 +120,7 @@ export default function EditableList({
               {f.type === 'select' ? (
                 <select className="input-field" value={newItem[f.key] || f.default || ''}
                   onChange={e => setNewItem(p => ({ ...p, [f.key]: e.target.value }))}>
-                  {f.options.map(o => <option key={o}>{o}</option>)}
+                  {f.options.map(o => <option key={o.v} value={o.v}>{o.label}</option>)}
                 </select>
               ) : (
                 <input className="input-field" type={f.type || 'text'}
