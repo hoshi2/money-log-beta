@@ -5,7 +5,6 @@ import { loadCloud, connectCloud, cloudPull, cloudPullLegacy, cloudPush, cloudSu
 import Dashboard from './components/Dashboard';
 import ExpensesTab from './components/ExpensesTab';
 import DebtsTab from './components/DebtsTab';
-import UnpaidTab from './components/UnpaidTab';
 import SettingsTab from './components/SettingsTab';
 import './styles/global.css';
 
@@ -13,14 +12,13 @@ const TABS = [
   { id: 'home', label: 'ホーム', icon: '⊕' },
   { id: 'expenses', label: '固定費', icon: '◆' },
   { id: 'debts', label: '借金', icon: '▽' },
-  { id: 'unpaid', label: '未払い', icon: '△' },
   { id: 'settings', label: '設定', icon: '⚙' },
 ];
 
 // 起動時のデータ: 新しい保存(v3) → 無ければ旧データ(v2)を変換（旧データは消さない） → 無ければ空
 function initialState() {
   const v3 = load();
-  if (v3) return v3;
+  if (v3) { save(v3); return v3; }   // 形が古ければ整えて保存し直す
   if (!IS_BETA) {
     const legacy = loadLegacy();
     if (legacy) { const m = ensureV3(legacy); save(m); return m; }
@@ -130,7 +128,6 @@ export default function App() {
         {tab === 'home' && <Dashboard data={data} totals={totals} go={setTab} />}
         {tab === 'expenses' && <ExpensesTab data={data} updateData={updateData} totals={totals} />}
         {tab === 'debts' && <DebtsTab data={data} updateData={updateData} totals={totals} />}
-        {tab === 'unpaid' && <UnpaidTab data={data} updateData={updateData} totals={totals} />}
         {tab === 'settings' && <SettingsTab data={data} updateData={updateData} cloudOn={cloudOn} />}
       </main>
     </div>

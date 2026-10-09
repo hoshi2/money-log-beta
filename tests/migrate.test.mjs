@@ -27,12 +27,13 @@ test('v2 → 現行: 件数と金額が保たれ、不要な項目が落ちる',
   assert.equal(v3.version, 3);
   assert.equal(v3.expenses.length, 2);
   assert.equal(v3.expenses[0].kind, 'fixed'); assert.equal(v3.expenses[1].kind, 'sub', 'ChatGPT はサブスク扱い');
-  assert.equal(v3.debts.length, 3, '借金①と借金Ⅱが1つの一覧になる');
+  assert.equal(v3.debts.length, 4, '借金①・借金Ⅱ・未払いが1つの一覧になる');
   assert.equal(debtGroup(v3.debts[0]), 'monthly');
   assert.equal(debtGroup(v3.debts[1]), 'due');
   assert.equal(v3.debts[2].done, true, 'status=done は返済済み扱い');
   assert.equal(v3.debts[1].balance, 5000, '借金Ⅱの amount は残額になる');
-  assert.equal(v3.unpaid.length, 1);
+  assert.equal(debtGroup(v3.debts[3]), 'unpaid'); assert.equal(v3.debts[3].balance, 900);
+  assert.ok(!('unpaid' in v3));
   assert.ok(!('assets' in v3) && !('income' in v3) && !('incomingJuly' in v3));
   const t = calcTotals(v3);
   assert.equal(t.debtMonthlyGroup, 120000);
@@ -41,11 +42,12 @@ test('v2 → 現行: 件数と金額が保たれ、不要な項目が落ちる',
   assert.equal(t.unpaidTotal, 900);
   assert.equal(t.totalDebt, 120000 + 5000 + 900);
   assert.equal(t.subsMonthly, 3000); assert.equal(t.fixedMonthly, 3000);
+  assert.equal(t.regularMonthly, 6000 + 10000);
   assert.equal(t.thisMonthPay, 6000 + 10000 + 0);
 });
 
 test('月額も期限も無い借金は「その他」', () => {
-  const s = ensureV3({ version: 3, debts: [{ id: 'x', name: 'n', balance: 100 }], expenses: [], unpaid: [] });
+  const s = ensureV3({ version: 3, debts: [{ id: 'x', name: 'n', balance: 100 }], expenses: [] });
   assert.equal(debtGroup(s.debts[0]), 'other');
   assert.equal(calcTotals(s).debtOtherGroup, 100);
 });
@@ -56,9 +58,13 @@ test('ensureV3: 現行はそのまま、v2 は変換、ベータ初期の形も�
   assert.equal(ensureV3(sampleV2).version, 3);
   assert.equal(ensureV3(null), null);
   assert.deepEqual(ensureV3({ version: 3 }), INITIAL_DATA);
-  const interim = { version: 3, expenses: [], unpaid: [], debtMonthly: [{ id: 'm', name: 'M', balance: 10, monthly: 1 }], debtDue: [{ id: 'd', name: 'D', amount: 20, dueDate: '2026-12-01', done: false }] };
+  const interim = { version: 3, expenses: [], unpaid: [{ id: 'u', name: 'U', amount: 5, category: 'カード' }], debtMonthly: [{ id: 'm', name: 'M', balance: 10, monthly: 1 }], debtDue: [{ id: 'd', name: 'D', amount: 20, dueDate: '2026-12-01', done: false }] };
   const merged = ensureV3(interim);
-  assert.equal(merged.debts.length, 2); assert.equal(merged.debts[1].balance, 20);
+  assert.equal(merged.debts.length, 3); assert.equal(merged.debts[1].balance, 20);
+  assert.equal(debtGroup(merged.debts[2]), 'unpaid'); assert.ok(!('unpaid' in merged));
+  // 前の v3（unpaid が別配列）も吸収
+  const prev = { version: 3, expenses: [], debts: [{ id: 'a', name: 'A', balance: 1 }], unpaid: [{ id: 'u2', name: 'U2', amount: 7 }] };
+  const m2 = ensureV3(prev); assert.equal(m2.debts.length, 2); assert.equal(m2.debts[1].kind, 'unpaid');
 });
 
 test('年払いは12で割る、期限の日数', () => {
@@ -90,15 +96,14 @@ test('実データのバックアップ（あれば）: 件数と合計が変換
     const v3 = ensureV3(old);
     const t = calcTotals(v3);
     assert.equal(v3.expenses.length, (old.expenses || []).length);
-    assert.equal(v3.debts.length, (old.debt1 || []).length + (old.debt2 || []).length);
-    assert.equal(v3.unpaid.length, (old.unpaid || []).length);
+    assert.equal(v3.debts.length, (old.debt1 || []).length + (old.debt2 || []).length + (old.unpaid || []).length);
     assert.equal(t.debtMonthlyGroup, sum((old.debt1 || []).filter(d => (d.monthly || 0) > 0), 'balance'));
     assert.equal(t.debtDueGroup + t.debtOtherGroup, sum((old.debt1 || []).filter(d => !(d.monthly > 0)), 'balance') + sum((old.debt2 || []).filter(d => !(d.done || d.status === 'done')), 'amount'));
     assert.equal(t.debtTotal, sum(old.debt1 || [], 'balance') + sum((old.debt2 || []).filter(d => !(d.done || d.status === 'done')), 'amount'));
     assert.equal(t.unpaidTotal, sum(old.unpaid || [], 'amount'));
     assert.equal(t.expensesMonthly, sum(old.expenses || [], 'amount'));
     assert.deepEqual(ensureV3(v3), v3, 'two-pass idempotent');
-    console.log(`  ${f}: ok (expenses=${v3.expenses.length} [sub=${v3.expenses.filter(e => e.kind === 'sub').length}], debts=${v3.debts.length} [monthly=${v3.debts.filter(d => debtGroup(d) === 'monthly').length}, due=${v3.debts.filter(d => debtGroup(d) === 'due').length}, other=${v3.debts.filter(d => debtGroup(d) === 'other').length}], unpaid=${v3.unpaid.length})`);
+    console.log(`  ${f}: ok (expenses=${v3.expenses.length} [sub=${v3.expenses.filter(e => e.kind === 'sub').length}], debts=${v3.debts.length} [due=${v3.debts.filter(d => debtGroup(d) === 'due').length}, other=${v3.debts.filter(d => debtGroup(d) === 'other').length}, monthly=${v3.debts.filter(d => debtGroup(d) === 'monthly').length}, unpaid=${v3.debts.filter(d => debtGroup(d) === 'unpaid').length}])`);
   }
 });
 

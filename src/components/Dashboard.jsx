@@ -19,7 +19,7 @@ export default function Dashboard({ data, totals, go }) {
         <div className="nw-big-label" style={{ color: 'var(--red)' }}>借金の総額</div>
         <div className="nw-big-value neg">{fmt(totals.totalDebt)}</div>
         <div className="kpi-sub" style={{ marginTop: 6 }}>
-          毎月返済 {fmt(totals.debtMonthlyGroup)} ／ 期限あり {fmt(totals.debtDueGroup)} ／ その他 {fmt(totals.debtOtherGroup)} ／ 未払い {fmt(totals.unpaidTotal)}
+          期限つき {fmt(totals.debtDueGroup)} ／ 期限なし {fmt(totals.debtOtherGroup)} ／ 毎月返済 {fmt(totals.debtMonthlyGroup)} ／ 未払い {fmt(totals.unpaidTotal)}
         </div>
       </div>
 
@@ -28,9 +28,10 @@ export default function Dashboard({ data, totals, go }) {
         <div className="row-line"><span>サブスク（月あたり）</span><b>{fmt(totals.subsMonthly)}</b></div>
         <div className="row-line"><span>固定費（月あたり）</span><b>{fmt(totals.fixedMonthly)}</b></div>
         <div className="row-line"><span>借金の月額返済</span><b>{fmt(totals.monthlyPayment)}</b></div>
-        <div className="row-line"><span>今月が期限の借金</span><b>{fmt(totals.dueThisMonth)}</b></div>
         <div className="divider" />
-        <div className="row-line total"><span>合計</span><b className="red">{fmt(totals.thisMonthPay)}</b></div>
+        <div className="row-line total"><span>毎月の支払い 合計</span><b className="red">{fmt(totals.regularMonthly)}</b></div>
+        <div className="divider" />
+        <div className="row-line total"><span>今月が期限の借金</span><b className="red">{fmt(totals.dueThisMonth)}</b></div>
         {totals.monthsToPayoff && (
           <div className="kpi-sub" style={{ marginTop: 8 }}>毎月返済の完済予定: 約{totals.monthsToPayoff}ヶ月後（{getPayoffDate(totals.monthsToPayoff)}）</div>
         )}

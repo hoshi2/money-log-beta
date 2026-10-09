@@ -347,3 +347,12 @@ select.input-field { cursor: pointer; }
 @media (max-width: 360px) {
   .kpi-value { font-size: 14px; }
 }
+
+/* COLLAPSIBLE GROUP HEADERS */
+.group-head-btn {
+  width: calc(100% - 28px); margin: 12px 14px 4px; padding: 9px 12px;
+  display: flex; justify-content: space-between; align-items: center; gap: 8px;
+  background: var(--bg2); border: 1px solid var(--border); border-radius: 9px;
+  font-family: inherit; font-size: 13px; font-weight: 700; color: var(--text); cursor: pointer; text-align: left;
+}
+.group-head-btn .chev { display: inline-block; width: 16px; font-size: 10px; color: var(--text3); }
