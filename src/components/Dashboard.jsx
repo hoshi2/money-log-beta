@@ -18,14 +18,15 @@ export default function Dashboard({ data, totals, go }) {
         <div className="nw-big-label" style={{ color: 'var(--red)' }}>借金の総額</div>
         <div className="nw-big-value neg">{fmt(totals.totalDebt)}</div>
         <div className="kpi-sub" style={{ marginTop: 6 }}>
-          毎月返済 {fmt(totals.debtMonthlyTotal)} ／ 期限つき {fmt(totals.debtDueTotal)} ／ 未払い {fmt(totals.unpaidTotal)}
+          毎月返済 {fmt(totals.debtMonthlyGroup)} ／ 期限あり {fmt(totals.debtDueGroup)} ／ その他 {fmt(totals.debtOtherGroup)} ／ 未払い {fmt(totals.unpaidTotal)}
         </div>
       </div>
 
       <div className="section-label">今月の支払い</div>
       <div className="card" style={{ marginTop: 0 }}>
-        <div className="row-line"><span>固定費・サブスク（月あたり）</span><b>{fmt(totals.expensesMonthly)}</b></div>
-        <div className="row-line"><span>毎月返済の月額</span><b>{fmt(totals.debtMonthlyPayment)}</b></div>
+        <div className="row-line"><span>サブスク（月あたり）</span><b>{fmt(totals.subsMonthly)}</b></div>
+        <div className="row-line"><span>固定費（月あたり）</span><b>{fmt(totals.fixedMonthly)}</b></div>
+        <div className="row-line"><span>借金の月額返済</span><b>{fmt(totals.monthlyPayment)}</b></div>
         <div className="row-line"><span>今月が期限の借金</span><b>{fmt(totals.dueThisMonth)}</b></div>
         <div className="divider" />
         <div className="row-line total"><span>合計</span><b className="red">{fmt(totals.thisMonthPay)}</b></div>
@@ -36,17 +37,17 @@ export default function Dashboard({ data, totals, go }) {
 
       <div className="section-label">直近の期限</div>
       <div className="card" style={{ marginTop: 0 }}>
-        {next.length === 0 && <div className="kpi-sub">期限つきの借金はありません</div>}
+        {next.length === 0 && <div className="kpi-sub">期限のある借金はありません</div>}
         {next.map(d => {
           const l = dueLabel(d);
           return (
-            <div key={d.id} className="row-line" onClick={() => go('due')} style={{ cursor: 'pointer' }}>
+            <div key={d.id} className="row-line" onClick={() => go('debts')} style={{ cursor: 'pointer' }}>
               <span>
                 <span className={`badge ${l.cls === 'red' ? 'badge-red' : 'badge-blue'}`} style={{ marginRight: 8 }}>{fmtDate(d.dueDate)}</span>
                 {d.name}
                 <span className="kpi-sub" style={{ marginLeft: 6 }}>{l.text}</span>
               </span>
-              <b className={l.cls}>{fmt(d.amount)}</b>
+              <b className={l.cls}>{fmt(d.balance)}</b>
             </div>
           );
         })}

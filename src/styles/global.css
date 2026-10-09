@@ -326,6 +326,9 @@ select.input-field { cursor: pointer; }
 .list-item.warn { border-color: var(--red-border); background: var(--red-bg); }
 .item-sub.red { color: var(--red); font-weight: 600; }
 .item-sub.green { color: var(--green); }
+.move-btns { display: flex; flex-direction: column; gap: 3px; flex-shrink: 0; }
+.move-btns .btn { padding: 2px 7px; font-size: 10px; line-height: 1.2; }
+.section-label.group-head { display: flex; justify-content: space-between; align-items: baseline; text-transform: none; letter-spacing: 0; font-size: 12px; }
 
 /* NET WORTH BIG */
 .nw-big {

@@ -4,8 +4,7 @@ import { calcTotals, fmt, save, load, loadLegacy, ensureV3, IS_BETA } from './ut
 import { loadCloud, connectCloud, cloudPull, cloudPullLegacy, cloudPush, cloudSubscribe } from './utils/cloud';
 import Dashboard from './components/Dashboard';
 import ExpensesTab from './components/ExpensesTab';
-import DebtMonthlyTab from './components/DebtMonthlyTab';
-import DueTab from './components/DueTab';
+import DebtsTab from './components/DebtsTab';
 import UnpaidTab from './components/UnpaidTab';
 import SettingsTab from './components/SettingsTab';
 import './styles/global.css';
@@ -13,8 +12,7 @@ import './styles/global.css';
 const TABS = [
   { id: 'home', label: 'ホーム', icon: '⊕' },
   { id: 'expenses', label: '固定費', icon: '◆' },
-  { id: 'monthly', label: '毎月返済', icon: '▽' },
-  { id: 'due', label: '期限つき', icon: '◉' },
+  { id: 'debts', label: '借金', icon: '▽' },
   { id: 'unpaid', label: '未払い', icon: '△' },
   { id: 'settings', label: '設定', icon: '⚙' },
 ];
@@ -131,8 +129,7 @@ export default function App() {
       <main className="app-main">
         {tab === 'home' && <Dashboard data={data} totals={totals} go={setTab} />}
         {tab === 'expenses' && <ExpensesTab data={data} updateData={updateData} totals={totals} />}
-        {tab === 'monthly' && <DebtMonthlyTab data={data} updateData={updateData} totals={totals} />}
-        {tab === 'due' && <DueTab data={data} updateData={updateData} totals={totals} />}
+        {tab === 'debts' && <DebtsTab data={data} updateData={updateData} totals={totals} />}
         {tab === 'unpaid' && <UnpaidTab data={data} updateData={updateData} totals={totals} />}
         {tab === 'settings' && <SettingsTab data={data} updateData={updateData} cloudOn={cloudOn} />}
       </main>

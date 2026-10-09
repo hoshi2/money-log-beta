@@ -1,6 +1,6 @@
 import React from 'react';
 import EditableList from './EditableList';
-import { fmt } from '../utils/calc';
+import { fmt, moveItem } from '../utils/calc';
 
 const CATS = ['カード', '携帯', '法人', 'その他'].map(c => ({ v: c, label: c }));
 
@@ -21,6 +21,7 @@ export default function UnpaidTab({ data, updateData, totals }) {
           onUpdate={(id, k, v) => updateData(p => ({ ...p, unpaid: p.unpaid.map(u => u.id === id ? { ...u, [k]: v } : u) }))}
           onDelete={(id) => { if (confirm('削除しますか？')) updateData(p => ({ ...p, unpaid: p.unpaid.filter(u => u.id !== id) })); }}
           onAdd={(item) => updateData(p => ({ ...p, unpaid: [...p.unpaid, item] }))}
+          onMove={(id, dir) => updateData(p => ({ ...p, unpaid: moveItem(p.unpaid, id, dir) }))}
           fields={[
             { key: 'category', label: 'カテゴリ', type: 'select', options: CATS, default: 'その他' },
             { key: 'note', label: 'メモ' },

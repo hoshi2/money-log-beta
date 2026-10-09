@@ -12,6 +12,7 @@ export default function EditableList({
   nameKey = 'name',
   colorFn = () => 'red',
   subText = null,
+  onMove = null,
   showDone = false,
   onToggleDone,
   addLabel = '+ 追加',
@@ -58,11 +59,12 @@ export default function EditableList({
               </div>
               {subText && <div className="item-sub">{subText(item)}</div>}
             </div>
-            <button
-              className="btn btn-xs btn-danger"
-              style={{ flexShrink: 0 }}
-              onClick={() => onDelete(item.id)}
-            >削除</button>
+            {onMove && (
+              <div className="move-btns">
+                <button className="btn btn-xs btn-ghost" onClick={() => onMove(item.id, -1)} aria-label="上へ">▲</button>
+                <button className="btn btn-xs btn-ghost" onClick={() => onMove(item.id, 1)} aria-label="下へ">▼</button>
+              </div>
+            )}
           </div>
 
           {editId === item.id && (
@@ -93,7 +95,10 @@ export default function EditableList({
                   )}
                 </div>
               ))}
-              <button className="btn btn-primary btn-sm" onClick={() => setEditId(null)}>✓ 閉じる</button>
+              <div style={{ display: 'flex', gap: 8 }}>
+                <button className="btn btn-primary btn-sm" onClick={() => setEditId(null)}>✓ 閉じる</button>
+                <button className="btn btn-danger btn-sm" onClick={() => onDelete(item.id)}>削除</button>
+              </div>
             </div>
           )}
         </div>
