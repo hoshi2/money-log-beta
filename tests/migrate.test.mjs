@@ -101,3 +101,10 @@ test('実データのバックアップ（あれば）: 件数と合計が変換
     console.log(`  ${f}: ok (expenses=${v3.expenses.length} [sub=${v3.expenses.filter(e => e.kind === 'sub').length}], debts=${v3.debts.length} [monthly=${v3.debts.filter(d => debtGroup(d) === 'monthly').length}, due=${v3.debts.filter(d => debtGroup(d) === 'due').length}, other=${v3.debts.filter(d => debtGroup(d) === 'other').length}], unpaid=${v3.unpaid.length})`);
   }
 });
+
+test('3ヶ月後の日付が作れる', async () => {
+  const { monthsAhead } = await import('../src/utils/calc.js');
+  const s = monthsAhead(3);
+  assert.match(s, /^\d{4}-\d{2}-\d{2}$/);
+  assert.ok(s > new Date().toISOString().slice(0, 10));
+});

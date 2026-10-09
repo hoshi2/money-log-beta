@@ -25,6 +25,11 @@ export const isThisMonth = (dateStr) => {
   const now = new Date();
   return dateStr.slice(0, 7) === `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
 };
+// 今日から n ヶ月後の日付（YYYY-MM-DD）
+export const monthsAhead = (n) => {
+  const d = new Date(); d.setMonth(d.getMonth() + n);
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+};
 export const fmtDate = (dateStr) => {
   if (!dateStr) return '期限なし';
   const [, m, d] = dateStr.split('-');

@@ -1,5 +1,5 @@
 import React from 'react';
-import { fmt, fmtDate, daysUntil, getPayoffDate } from '../utils/calc';
+import { fmt, fmtDate, daysUntil, getPayoffDate, monthsAhead } from '../utils/calc';
 
 function dueLabel(d) {
   const n = daysUntil(d.dueDate);
@@ -11,7 +11,8 @@ function dueLabel(d) {
 }
 
 export default function Dashboard({ data, totals, go }) {
-  const next = totals.upcoming.slice(0, 3);
+  const limit = monthsAhead(3);
+  const next = totals.upcoming.filter(d => d.dueDate <= limit); // 期限切れも含め、3ヶ月以内を全部
   return (
     <div>
       <div className="nw-big" style={{ borderColor: 'var(--red-border)', background: 'var(--red-bg)' }}>
@@ -35,9 +36,9 @@ export default function Dashboard({ data, totals, go }) {
         )}
       </div>
 
-      <div className="section-label">直近の期限</div>
+      <div className="section-label">直近の期限（3ヶ月以内）</div>
       <div className="card" style={{ marginTop: 0 }}>
-        {next.length === 0 && <div className="kpi-sub">期限のある借金はありません</div>}
+        {next.length === 0 && <div className="kpi-sub">3ヶ月以内に期限の借金はありません</div>}
         {next.map(d => {
           const l = dueLabel(d);
           return (
